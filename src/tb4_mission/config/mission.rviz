@@ -1,0 +1,99 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+  - Class: rviz_common/Tool Properties
+    Name: Tool Properties
+  - Class: nav2_rviz_plugins/Navigation 2
+    Name: Navigation 2
+Visualization Manager:
+  Class: ""
+  Global Options:
+    Background Color: 35; 38; 42
+    Fixed Frame: map
+    Frame Rate: 20
+  Displays:
+    - Class: rviz_default_plugins/Grid
+      Name: Grid
+      Enabled: true
+      Cell Size: 1
+      Plane Cell Count: 30
+    - Class: rviz_default_plugins/Map
+      Name: SLAM Map
+      Enabled: true
+      Alpha: 0.8
+      Topic:
+        Value: /map
+        Reliability Policy: Reliable
+        Durability Policy: Transient Local
+        Depth: 1
+      Color Scheme: map
+    - Class: rviz_default_plugins/TF
+      Name: Robot TF
+      Enabled: true
+      Show Arrows: true
+      Show Axes: true
+      Show Names: false
+      Marker Scale: 0.3
+    - Class: rviz_default_plugins/LaserScan
+      Name: LiDAR
+      Enabled: true
+      Topic:
+        Value: /scan
+        Reliability Policy: Best Effort
+        Durability Policy: Volatile
+        Depth: 5
+      Size (m): 0.025
+      Style: Points
+      Color: 255; 100; 100
+      Color Transformer: FlatColor
+    - Class: rviz_default_plugins/MarkerArray
+      Name: Target IDs and Positions
+      Enabled: true
+      Marker Topic:
+        Value: /mission/markers
+        Reliability Policy: Reliable
+        Durability Policy: Transient Local
+        Depth: 1
+    - Class: rviz_default_plugins/Path
+      Name: Navigation Path
+      Enabled: true
+      Topic:
+        Value: /plan
+        Reliability Policy: Reliable
+        Durability Policy: Volatile
+        Depth: 5
+      Color: 60; 220; 255
+      Line Style: Lines
+      Line Width: 0.03
+    - Class: rviz_default_plugins/Map
+      Name: Local Costmap
+      Enabled: false
+      Alpha: 0.4
+      Topic:
+        Value: /local_costmap/costmap
+        Reliability Policy: Reliable
+        Durability Policy: Transient Local
+        Depth: 1
+      Color Scheme: costmap
+  Tools:
+    - Class: rviz_default_plugins/Interact
+    - Class: rviz_default_plugins/MoveCamera
+    - Class: rviz_default_plugins/Select
+    - Class: rviz_default_plugins/SetInitialPose
+      Topic:
+        Value: /initialpose
+    - Class: nav2_rviz_plugins/GoalTool
+    - Class: rviz_default_plugins/PublishPoint
+      Topic:
+        Value: /clicked_point
+  Views:
+    Current:
+      Class: rviz_default_plugins/TopDownOrtho
+      Name: Current View
+      Scale: 35
+      Target Frame: <Fixed Frame>
+      X: 0
+      Y: 0
+Window Geometry:
+  Width: 1280
+  Height: 800

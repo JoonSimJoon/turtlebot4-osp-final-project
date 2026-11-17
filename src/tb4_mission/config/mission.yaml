@@ -1,0 +1,29 @@
+# Node parameters. Frame/topic/output values can also be set through launch arguments.
+explorer:
+  ros__parameters:
+    autostart: false
+    time_limit_sec: 600.0
+    target_count: 3
+    robot_radius: 0.22
+    frontier_min_cells: 4
+    frontier_standoff: 0.35
+    min_goal_distance: 0.35
+    coverage_spacing: 1.0
+    coverage_observation_radius: 1.2
+    goal_timeout_sec: 70.0
+    progress_timeout_sec: 25.0
+    scan_after_goal: true
+    spin_timeout_sec: 40.0
+marker_detector:
+  ros__parameters:
+    processing_hz: 5.0
+    sync_tolerance_sec: 0.15
+    sensor_max_age_sec: 1.5
+    confirmations: 3
+    confirmation_spread_m: 0.35
+    confirmation_window_sec: 4.0
+    surface_max_gap_m: 0.20
+    surface_max_residual_m: 0.035
+    surface_min_support: 5
+    max_target_distance_m: 6.0
+    max_confirmation_distance_m: 1.8
