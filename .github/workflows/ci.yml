@@ -1,0 +1,75 @@
+name: ROS Jazzy CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: Ubuntu 24.04 / ROS 2 Jazzy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      DEBIAN_FRONTEND: noninteractive
+      PYTEST_DISABLE_PLUGIN_AUTOLOAD: '1'
+      TB4_RUN_ROS_TESTS: '1'
+      ROS_DOMAIN_ID: '91'
+      ROS_LOCALHOST_ONLY: '1'
+      RMW_IMPLEMENTATION: rmw_fastrtps_cpp
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Install deployed dependencies and build
+        run: ./start.sh setup
+
+      - name: Verify installed executables and launch arguments
+        shell: bash
+        run: |
+          source /opt/ros/jazzy/setup.bash
+          source install/setup.bash
+          mkdir -p test-results
+          bash -n start.sh scripts/*.sh
+          /usr/bin/python3 -m compileall -q src scripts
+          ros2 pkg executables tb4_mission | tee test-results/executables.txt
+          ros2 launch tb4_mission mission.launch.py --show-args > test-results/mission-launch.txt
+          ros2 launch turtlebot4_navigation slam.launch.py --show-args > test-results/vendor-slam-launch.txt
+          ros2 launch turtlebot4_navigation nav2.launch.py --show-args > test-results/vendor-nav2-launch.txt
+          ros2 launch turtlebot4_navigation localization.launch.py --show-args > test-results/vendor-localization-launch.txt
+
+      - name: Run logic and ROS transport tests
+        shell: bash
+        run: |
+          source /opt/ros/jazzy/setup.bash
+          source install/setup.bash
+          export PYTHONPATH="$PWD/src/tb4_mission:${PYTHONPATH:-}"
+          /usr/bin/python3 -m pytest -q --junitxml=test-results/pytest.xml
+          /usr/bin/python3 - <<'PY'
+          import xml.etree.ElementTree as ET
+          suites = ET.parse('test-results/pytest.xml').getroot().findall('testsuite')
+          totals = {key: sum(int(suite.get(key, '0')) for suite in suites)
+                    for key in ('tests', 'skipped', 'errors', 'failures')}
+          assert totals['tests'] > 0, totals
+          assert not any(totals[key] for key in ('skipped', 'errors', 'failures')), totals
+          print('All collected tests executed successfully:', totals)
+          PY
+
+      - name: Keep verification reports
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: ubuntu-jazzy-verification
+          path: test-results/
+          if-no-files-found: warn
+          retention-days: 14
